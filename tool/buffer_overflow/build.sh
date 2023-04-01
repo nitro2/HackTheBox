@@ -1,0 +1,1 @@
+gcc -o eggshell eggshell.c -m32
