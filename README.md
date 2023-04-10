@@ -9,3 +9,4 @@ My walkthrough for solving challenges from https://app.hackthebox.com/challenges
 # Hardware
 
 - [Debugging interface](debugging-interface)
+- [The Needle](the-needle)
