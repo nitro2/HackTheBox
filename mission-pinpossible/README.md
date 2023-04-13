@@ -131,16 +131,85 @@ There are 3 types of instructions: IR, BF+AC, and DR
 
 For 4-bit mode, it sends 2 times on the DB7-DB4 bus to present 1 byte.
 
+![Alt text](LCD3.png)
 
-Let decode some first data bytes:
+If we only care about Data register, we will pick only E=1 and RS=1
+Meaning Data & 0x05 = True
+
+So we will filter some data like: 0x2D
+before filter:
 ```s
-Data
-0x08 -> 
-0x0C
-0x08
-0x18
-0x1C
-0x18
-...
+0.453817500000000,13,0x27,0x2D,Write,ACK
+0.454047000000000,14,0x27,0x29,Write,ACK
+0.454337000000000,15,0x27,0x09,Write,ACK
+0.454566500000000,16,0x27,0x0D,Write,ACK
+0.454796000000000,17,0x27,0x09,Write,ACK
+0.455081000000000,18,0x27,0x49,Write,ACK
+0.455316000000000,19,0x27,0x4D,Write,ACK
+0.455545500000000,20,0x27,0x49,Write,ACK
+0.455830500000000,21,0x27,0x59,Write,ACK
+0.456060000000000,22,0x27,0x5D,Write,ACK
+0.456289500000000,23,0x27,0x59,Write,ACK
+0.456574500000000,24,0x27,0x69,Write,ACK
+0.456804000000000,25,0x27,0x6D,Write,ACK
+0.457034000000000,26,0x27,0x69,Write,ACK
+0.457313500000000,27,0x27,0xE9,Write,ACK
+0.457543000000000,28,0x27,0xED,Write,ACK
 ```
+after filter:
+```s
+0.453817500000000,13,0x27,0x2D,Write,ACK
+0.454566500000000,16,0x27,0x0D,Write,ACK
+0.455316000000000,19,0x27,0x4D,Write,ACK
+0.456060000000000,22,0x27,0x5D,Write,ACK
+0.456804000000000,25,0x27,0x6D,Write,ACK
+0.457543000000000,28,0x27,0xED,Write,ACK
+```
+then combine 2 line them into 1 byte:
+```s
+0x20,0x45,0x6E -> " En"
+```
+
+Great! Look like we got " En" in the " Enter Password" string from the picture
+
+Look like the format if `0x*D` . 
+
+```s
+cat content.txt| grep "0x\dD" > filterdata.txt
+```
+
+Let write python script to filter them.
+```python
+filename = "filterdata.txt"
+with open(filename) as file:
+    lines = [line.rstrip() for line in file]
+    hex = ""
+    for i in range(0,len(lines),2):
+        try:
+            hex +=lines[i][2]+lines[i+1][2]
+            print(bytes.fromhex(lines[i][2]+lines[i+1][2]).decode("ascii"), end="")
+        except:
+            i+1
+            print("\n\n===Error: ===", i)
+            pass
+```
+
+Output:
+```s
+Enter PasswordH Enter Password*T Enter Password**B Enter Password***{ Enter Password****8 Enter Password*****4 Enter Password******d Enter Password*******_ Enter Password********d Enter Password*********3 Enter Password**********5 Enter Password***********1 Enter Password************9 Enter Password*************n Enter Password**************_ Enter Password***************c Enter Password****************4 Enter Password*****************n Enter Password******************_ Enter Password*******************1 Enter Password********************3 Enter Password*********************4 Enter Password**********************d Enter Password***********************_ Enter Password************************7 Enter Password*************************0 Enter Password**************************_ Enter Password***************************1 Enter Password****************************3 Enter Password*****************************4 Enter Password******************************k Enter Password*******************************5 Enter Password********************************! Enter Password*********************************d Enter Password**********************************@ Enter Password***********************************}
+
+===Error: === 2412
+ Enter Password************************************  ACCESS GRANDED SYSTEM
+
+===Error: === 2564
+ DISARM
+
+===Error: === 2580
+```
+
+We nearly got there. I see `H-T-B-{` pattern :D
+So why it's splitted by "Enter Password"? -> It's because the device needs to send the string continuously to keep it pop up to the LCD.
+
+Remove all the "Enter Password", " ", and "*".
+We got the flag: `HTB{84d_d3519n_c4n_134d_70_134k5!d@}`
 
