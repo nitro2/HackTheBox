@@ -11,3 +11,4 @@ My walkthrough for solving challenges from https://app.hackthebox.com/challenges
 - [Debugging interface](debugging-interface)
 - [The Needle](the-needle)
 - [Mission Pinpossible](mission-pinpossible)
+- [Factory](factory)
