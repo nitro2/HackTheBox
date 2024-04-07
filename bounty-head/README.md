@@ -223,6 +223,15 @@ Let create a small C program to print out the password:
 
 [reverse_password.c](reverse_password.c)
 
-Output: `FFFFFFC3FFFFFFF524FFFFFFF430FFFFFFEDFFFFFFC230FFFFFFEFFFFFFFE6313939393939`
+I got this 
+
+```c
+char local_88[16] = {0xf4, 0x98, 0x3a, 0x9a, 0x12, 0xa8, 0xf6, 0x12, 
+                        0x12, 0xda, 0xaa, 0x12, 0x1a, 0xba, 0x14, 0x96};
+```
+
+But I think I need to use other decompiler tool for x64 ELF. 
+
+Look like ghidra cannot put these pieces together like I wanted
 
 Let make it as input for our write2.c 

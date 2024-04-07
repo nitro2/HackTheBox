@@ -35,11 +35,12 @@ void FUN_00101235(char *param_1)
   local_88 = 0x12f6a8129a3a98f4;
   local_80 = 0x9614ba1a12aada12;
   local_30 = 0x10;
-  local_38 = (char *)malloc(0x10);
-  for (local_c = 0; local_c < 0x10; local_c = local_c + 1) {
-    local_38[(int)local_c] = *(uint8_t *)((long)&local_88 + (long)(int)local_c) >> 1 ^ 0x39;
-  }
-  iVar1 = strcmp(param_1,local_38);
+  // local_38 = (char *)malloc(0x10);
+  // for (local_c = 0; local_c < 0x10; local_c = local_c + 1) {
+  //   local_38[(int)local_c] = *(uint8_t *)((long)&local_88 + (long)(int)local_c) >> 1 ^ 0x39;
+  // }
+  // iVar1 = strcmp(param_1,local_38);
+  iVar1 = 0;
   if (iVar1 == 0) {
     puts("\nLoading File System.");
     sVar2 = strlen(param_1);
@@ -54,6 +55,7 @@ void FUN_00101235(char *param_1)
       sscanf(local_20,"%2hhx",local_98 + local_28);
       local_20 = local_20 + 2;
     }
+    printf("%s\n", local_20);
     local_48 = "efs.bin";
     local_50 = fopen("efs.bin","rb");
     local_58 = fopen("temp_03455.bin","wb");

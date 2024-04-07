@@ -6,16 +6,18 @@
 int main()
 {
     int iVar1;
-    long local_88;
+    uint64_t local_80;
     char *local_38;
     uint32_t local_c;
 
-    local_88 = 0x12f6a8129a3a98f4;
-
+    char local_88[16] = {0xf4, 0x98, 0x3a, 0x9a, 0x12, 0xa8, 0xf6, 0x12, 
+                        0x12, 0xda, 0xaa, 0x12, 0x1a, 0xba, 0x14, 0x96};
+    
     local_38 = (char *)malloc(0x10);
     for (local_c = 0; local_c < 0x10; local_c = local_c + 1)
     {
-        local_38[(int)local_c] = *(char *)((long)&local_88 + (long)(int)local_c) >> 1 ^ 0x39;
+        // local_38[(int)local_c] = *(char *)((uint64_t)&local_88 + (uint64_t)(int)local_c) >> 1 ^ 0x39;
+        local_38[local_c] = local_88[local_c] ;
     }
     // printf("%s", local_38);
 
